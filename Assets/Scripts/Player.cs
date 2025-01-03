@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     private Vector3 _position;
     [SerializeField] private float _speed;
     private bool isWalking;
+    [SerializeField] GameInput gameInput;
 
     public bool IsWalking { get { return isWalking; }     
     }
@@ -20,26 +21,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        Vector2 inputVector = new Vector2(0, 0);
+        Vector2 inputVector = gameInput.GameMovmentVectorNormalized();
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            inputVector.y = +1;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            inputVector.x = -1;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            inputVector.y = -1;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            inputVector.x = +1;
-        }
-
-        inputVector = inputVector.normalized;
         _position = new Vector3(inputVector.x, 0, inputVector.y);
 
         transform.position += _position * _speed * Time.deltaTime;

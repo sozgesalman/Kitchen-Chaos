@@ -25,7 +25,38 @@ public class Player : MonoBehaviour
 
         _position = new Vector3(inputVector.x, 0, inputVector.y);
 
-        transform.position += _position * _speed * Time.deltaTime;
+        float moveDistance = _speed * Time.deltaTime;
+        float hitSize  = 0.7f;
+        float playerHeight = 2;
+
+        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, hitSize, _position, moveDistance);
+
+        if (!canMove)
+        {
+            Vector3 _positionX = new Vector3(_position.x, 0, 0);
+
+            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, hitSize, _positionX, moveDistance);
+
+            if (canMove)
+            {
+                _position = _positionX;
+            }
+            else
+            {
+                Vector3 _positionZ = new Vector3(0, 0, _position.z);
+
+                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, hitSize, _positionZ, moveDistance);
+
+                if (canMove)
+                {
+                    _position = _positionZ;
+                }
+            }
+        }
+        if (canMove)
+        {
+            transform.position += _position * _speed * Time.deltaTime;
+        }
 
         isWalking = _position != Vector3.zero;
 

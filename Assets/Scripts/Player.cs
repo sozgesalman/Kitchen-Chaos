@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     private bool isWalking;
     [SerializeField] GameInput gameInput;
 
+    private Vector3 _lastPosition;
+
     public bool IsWalking { get { return isWalking; }     
     }
 
@@ -21,12 +23,43 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        HandleMovement();
+        HandleInteraction();
+
+    }
+
+    private void HandleInteraction()
+    {
+        Vector2 inputVector = gameInput.GameMovmentVectorNormalized();
+
+        _position = new Vector3(inputVector.x, 0, inputVector.y);
+
+        if(_position != Vector3.zero)
+        {
+            _lastPosition = _position;
+        }
+
+        float interactionDistance = 2f;
+
+        if(Physics.Raycast(transform.position, _lastPosition, out RaycastHit raycastHit, interactionDistance))
+        {
+            print(raycastHit.collider.name);
+        }
+        else
+        {
+            print("-");
+        }
+
+    }
+
+    private void HandleMovement() 
+    {
         Vector2 inputVector = gameInput.GameMovmentVectorNormalized();
 
         _position = new Vector3(inputVector.x, 0, inputVector.y);
 
         float moveDistance = _speed * Time.deltaTime;
-        float hitSize  = 0.7f;
+        float hitSize = 0.7f;
         float playerHeight = 2;
 
         bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, hitSize, _position, moveDistance);
@@ -61,8 +94,8 @@ public class Player : MonoBehaviour
         isWalking = _position != Vector3.zero;
 
         transform.forward = Vector3.Slerp(transform.forward, _position, Time.deltaTime * _speed);
-        print(transform.position);
+        //print(transform.position);
+
 
     }
-
 }

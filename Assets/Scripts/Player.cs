@@ -17,13 +17,36 @@ public class Player : MonoBehaviour
     private void Start()
     {               
         Application.targetFrameRate = 60;
+        gameInput.OnPlayerInteract += GameInput_OnPlayerInteract;
     }
 
+    private void GameInput_OnPlayerInteract(object sender, System.EventArgs e)
+    {
+        Vector2 inputVector = gameInput.GameMovmentVectorNormalized();
 
+        _position = new Vector3(inputVector.x, 0, inputVector.y);
+
+        if (_position != Vector3.zero)
+        {
+            _lastPosition = _position;
+        }
+
+        float interactionDistance = 2f;
+
+        if (Physics.Raycast(transform.position, _lastPosition, out RaycastHit raycastHit, interactionDistance))
+        {
+            print("Event Interact");
+        }
+        else
+        {
+            print("-");
+        }
+    }
 
     private void Update()
     {
         HandleMovement();
+         
         HandleInteraction();
 
     }
@@ -43,7 +66,7 @@ public class Player : MonoBehaviour
 
         if(Physics.Raycast(transform.position, _lastPosition, out RaycastHit raycastHit, interactionDistance))
         {
-            print(raycastHit.collider.name);
+            print(raycastHit.collider.name);            
         }
         else
         {

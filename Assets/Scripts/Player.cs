@@ -3,16 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     public static Player Instance { get; private set; }
 
     public event EventHandler<OnSelectedCounterEventArgs> OnSelectedCounterChanged;
+    public event EventHandler<OnPickUpEventArgs> OnPickedUp;
     public class OnSelectedCounterEventArgs : EventArgs
     {
         public ClearCounter selectedCounter;
     }
+    public class OnPickUpEventArgs : EventArgs
+    {
+        public KitchenObject kitchenObject;
+    }
 
+    [SerializeField] private Transform holdPoint;
+
+    private KitchenObject kitchenObject;
 
     private Vector3 _position;
     [SerializeField] private float _speed;
@@ -58,6 +66,7 @@ public class Player : MonoBehaviour
         HandleMovement();
          
         HandleInteraction();
+             
 
     }
 
@@ -96,6 +105,7 @@ public class Player : MonoBehaviour
         }
 
     }
+
 
     private void HandleMovement() 
     {
@@ -151,5 +161,38 @@ public class Player : MonoBehaviour
         {
             selectedCounter = selectedCounter 
         });
+    }
+
+    public void SetPickUpObject()
+    {
+        this.kitchenObject = selectedCounter.GetKitchenObject();
+        selectedCounter.ClearKitchenObject();
+
+        OnPickedUp?.Invoke(this, new OnPickUpEventArgs{});
+
+        kitchenObject.SetParent(this);
+        
+
+
+    }
+
+    public Transform HoldPosition()
+    {
+        return holdPoint;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObject = kitchenObject;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+
+    public void ClearKitchenObject()
+    {
+        kitchenObject = null;
     }
 }
